@@ -9,7 +9,9 @@
 <body>
     <form id="form1" runat="server">
     <div>
-        <h1><%= Request.Url %></h1>
+        <h1>Request.Url: <%= Request.Url %></h1>
+        <h1>Request.RawUrl: <%= Request.RawUrl %></h1>
+        <h1>HTTP_X_FORWARDED_PROTO: <%= Request.ServerVariables["HTTP_X_FORWARDED_PROTO"] %></h1>
     </div>
     </form>
 </body>
