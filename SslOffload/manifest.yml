@@ -1,0 +1,7 @@
+---
+applications:
+- name: ssloffload
+  host: ssloffload-aspnet
+  memory: 512m
+  stack: windows2012R2
+  buildpack: binary_buildpack
