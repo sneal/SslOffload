@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Web;
 
 namespace SslOffload
@@ -11,6 +12,9 @@ namespace SslOffload
 
         protected void Application_BeginRequest(object sender, EventArgs e)
         {
+            // Stash the original URL away before modification
+            HttpContext.Current.Items["OriginalUrl"] = Request.Url;
+
             // SSL offload?
             if ("https".Equals(HttpContext.Current.Request.ServerVariables["HTTP_X_FORWARDED_PROTO"],
                 StringComparison.InvariantCultureIgnoreCase))
@@ -18,6 +22,14 @@ namespace SslOffload
                 // This forces the IIS7WorkerRequest to generate a https URL
                 // https://github.com/Microsoft/referencesource/blob/4fe4349175f4c5091d972a7e56ea12012f1e7170/System.Web/Hosting/IIS7WorkerRequest.cs#L402
                 HttpContext.Current.Request.ServerVariables["HTTPS"] = "on";
+
+                // Force the HttpRequest object to rebuild its cached Url value
+                // Its possible an HttpModule has called Request.Url before we get here
+                FieldInfo urlField = typeof(HttpRequest).GetField("_url", BindingFlags.NonPublic | BindingFlags.Instance);
+                if (urlField != null)
+                {
+                    urlField.SetValue(HttpContext.Current.Request, null);
+                }
             }
         }
     }
