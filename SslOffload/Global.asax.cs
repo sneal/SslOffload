@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.Web;
+using NR = NewRelic.Api.Agent;
 
 namespace SslOffload
 {
@@ -8,10 +9,15 @@ namespace SslOffload
     {
         protected void Application_Start(object sender, EventArgs e)
         {
+            NR.NewRelic.SetApplicationName("SslOffload");
+            NR.NewRelic.StartAgent();
         }
 
         protected void Application_BeginRequest(object sender, EventArgs e)
         {
+            // New Relic event
+            NR.NewRelic.IncrementCounter("beginrequest");
+
             // Stash the original URL away before modification
             HttpContext.Current.Items["OriginalUrl"] = Request.Url;
 
